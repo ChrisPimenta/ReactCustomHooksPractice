@@ -1,8 +1,22 @@
 import classes from './LoadingSpinner.module.css';
+import { Fragment } from 'react';
+import ReactDOM from 'react-dom';
 
-// TODO: Finish loading spinner by adding using portals and adding it into the root dom node
-const LoadingSpinner = props => {
-    return <div className={classes['lds-circle']}>LOADING NOW......</div>
+const portalElement = document.getElementById('loading-spinner');
+
+const LoadingSpinner = (props) => {
+    return (
+        <Fragment>
+            {
+                ReactDOM.createPortal(
+                    <Fragment>
+                        <div className={classes['lds-backdrop']}>
+                            <div className={classes['lds-circle']}>Loading...<div></div></div>
+                        </div>
+                    </Fragment>, portalElement)
+            }
+        </Fragment>
+    )
 };
 
 export default LoadingSpinner;
