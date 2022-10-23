@@ -21,6 +21,7 @@ const AvailableMeals = () => {
     // TODO: Remove this line testing - Just here to test code is sync and UX is good for slower connections
     await sleep(2000);
 
+    // TODO: Add error handling
     const mealData = await response.json();
 
     setMeals(mealData);

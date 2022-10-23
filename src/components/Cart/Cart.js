@@ -1,11 +1,14 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 
 import Modal from '../UI/Modal';
 import CartItem from './CartItem';
 import classes from './Cart.module.css';
 import CartContext from '../../store/cart-context';
+import LoadingSpinner from '../UI/LoadingSpinner';
 
 const Cart = (props) => {
+  const [orderLoading, setOrderLoading] = useState(false);
+
   const cartCtx = useContext(CartContext);
 
   const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`;
@@ -17,6 +20,31 @@ const Cart = (props) => {
 
   const cartItemAddHandler = (item) => {
     cartCtx.addItem(item);
+  };
+
+  const orderHandler = async () => {
+    // Call API to place order
+    setOrderLoading(true);
+
+    const response = await fetch('https://react-custom-hooks-pract-d5cc1-default-rtdb.europe-west1.firebasedatabase.app/orders.json', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ items: cartCtx.items, displayedAmount: cartCtx.totalAmount })
+    });
+
+    if (response.ok) {
+      // Clear Cart
+      cartCtx.clearCart();
+      // Close cart
+      props.onClose();
+
+      alert('SUCCESS');
+    } else {
+      alert('API ERROR');
+    }
+    setOrderLoading(false);
   };
 
   const cartItems = (
@@ -41,11 +69,12 @@ const Cart = (props) => {
         <span>Total Amount</span>
         <span>{totalAmount}</span>
       </div>
+      {orderLoading && <LoadingSpinner />}
       <div className={classes.actions}>
         <button className={classes['button--alt']} onClick={props.onClose}>
           Close
         </button>
-        {hasItems && <button className={classes.button}>Order</button>}
+        {hasItems && <button className={classes.button} onClick={orderHandler}>Order</button>}
       </div>
     </Modal>
   );
