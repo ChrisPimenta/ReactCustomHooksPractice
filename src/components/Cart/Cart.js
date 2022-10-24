@@ -8,7 +8,7 @@ import LoadingSpinner from '../UI/LoadingSpinner';
 import useHttp from '../../hooks/use-http';
 
 const Cart = (props) => {
-  const { loading, error, httpRequest: postOrder } = useHttp();
+  const { isLoading, error, httpRequest: postOrder } = useHttp();
 
   const cartCtx = useContext(CartContext);
 
@@ -66,7 +66,7 @@ const Cart = (props) => {
         <span>Total Amount</span>
         <span>{totalAmount}</span>
       </div>
-      {loading && <LoadingSpinner loadingMessage='Placing your order...' />}
+      {isLoading && <LoadingSpinner loadingMessage='Placing your order...' />}
       <div className={classes.actions}>
         <button className={classes['button--alt']} onClick={props.onClose}>
           Close
