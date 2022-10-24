@@ -8,6 +8,7 @@ import LoadingSpinner from '../UI/LoadingSpinner';
 
 const Cart = (props) => {
   const [orderLoading, setOrderLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const cartCtx = useContext(CartContext);
 
@@ -26,25 +27,29 @@ const Cart = (props) => {
     // Call API to place order
     setOrderLoading(true);
 
-    const response = await fetch('https://react-custom-hooks-pract-d5cc1-default-rtdb.europe-west1.firebasedatabase.app/orders.json', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ items: cartCtx.items, displayedAmount: cartCtx.totalAmount })
-    });
+    try {
+      const response = await fetch('https://react-custom-hooks-pract-d5cc1-default-rtdb.europe-west1.firebasedatabase.app/orders.json', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ items: cartCtx.items, displayedAmount: cartCtx.totalAmount })
+      });
 
-    if (response.ok) {
-      // Clear Cart
-      cartCtx.clearCart();
-      // Close cart
-      props.onClose();
-
-      alert('SUCCESS');
-    } else {
-      alert('API ERROR');
+      if (response.ok) {
+        // Clear Cart
+        cartCtx.clearCart();
+        // Close cart
+        props.onClose();
+        setError(false);
+      } else {
+        throw Error('There was an error');
+      }
+    } catch (error) {
+      setError(true);
+    } finally {
+      setOrderLoading(false);
     }
-    setOrderLoading(false);
   };
 
   const cartItems = (
@@ -76,6 +81,7 @@ const Cart = (props) => {
         </button>
         {hasItems && <button className={classes.button} onClick={orderHandler}>Order</button>}
       </div>
+      {error && <p>There was an error, please try order again.</p>}
     </Modal>
   );
 };
