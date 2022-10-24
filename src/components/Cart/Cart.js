@@ -1,15 +1,14 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 
 import Modal from '../UI/Modal';
 import CartItem from './CartItem';
 import classes from './Cart.module.css';
 import CartContext from '../../store/cart-context';
 import LoadingSpinner from '../UI/LoadingSpinner';
-import { promiseSleep } from '../../test-helpers/promiseSleep';
+import useHttp from '../../hooks/use-http';
 
 const Cart = (props) => {
-  const [orderLoading, setOrderLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const { loading, error, httpRequest: postOrder } = useHttp();
 
   const cartCtx = useContext(CartContext);
 
@@ -24,35 +23,25 @@ const Cart = (props) => {
     cartCtx.addItem(item);
   };
 
-  const orderHandler = async () => {
-    // Call API to place order
-    setOrderLoading(true);
+  const orderSuccess = () => {
+    // Clear Cart
+    cartCtx.clearCart();
+    // Close cart
+    props.onClose();
+  }
 
-    try {
-      const response = await fetch('https://react-custom-hooks-pract-d5cc1-default-rtdb.europe-west1.firebasedatabase.app/orders.json', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ items: cartCtx.items, displayedAmount: cartCtx.totalAmount })
-      });
+  const sendOrderHandler = async () => {
 
-      await promiseSleep(2000);
-
-      if (response.ok) {
-        // Clear Cart
-        cartCtx.clearCart();
-        // Close cart
-        props.onClose();
-        setError(false);
-      } else {
-        throw Error('There was an error');
-      }
-    } catch (error) {
-      setError(true);
-    } finally {
-      setOrderLoading(false);
+    const requestConfig = {
+      url: 'https://react-custom-hooks-pract-d5cc1-default-rtdb.europe-west1.firebasedatabase.app/orders.json',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: { items: cartCtx.items, displayedAmount: cartCtx.totalAmount }
     }
+
+    await postOrder(requestConfig, orderSuccess);
   };
 
   const cartItems = (
@@ -63,8 +52,8 @@ const Cart = (props) => {
           name={item.name}
           amount={item.amount}
           price={item.price}
-          onRemove={cartItemRemoveHandler.bind(null, item.id)}
-          onAdd={cartItemAddHandler.bind(null, item)}
+          onRemove={() => { cartItemRemoveHandler(item.id) }}
+          onAdd={() => { cartItemAddHandler(item) }}
         />
       ))}
     </ul>
@@ -77,12 +66,12 @@ const Cart = (props) => {
         <span>Total Amount</span>
         <span>{totalAmount}</span>
       </div>
-      {orderLoading && <LoadingSpinner loadingMessage='Placing your order...' />}
+      {loading && <LoadingSpinner loadingMessage='Placing your order...' />}
       <div className={classes.actions}>
         <button className={classes['button--alt']} onClick={props.onClose}>
           Close
         </button>
-        {hasItems && <button className={classes.button} onClick={orderHandler}>Order</button>}
+        {hasItems && <button className={classes.button} onClick={sendOrderHandler}>Order</button>}
       </div>
       {error && <p>There was an error, please try order again.</p>}
     </Modal>
