@@ -11,7 +11,10 @@ const LoadingSpinner = (props) => {
                 ReactDOM.createPortal(
                     <Fragment>
                         <div className={classes['lds-backdrop']}>
-                            <div className={classes['lds-circle']}>Loading...<div></div></div>
+                            <div>
+                                <div className={classes['lds-text']}>{props.loadingMessage ? props.loadingMessage : 'Loading...'}</div>
+                                <div className={classes['lds-circle']}><div></div></div>
+                            </div>
                         </div>
                     </Fragment>, portalElement)
             }

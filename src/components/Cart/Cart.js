@@ -5,6 +5,7 @@ import CartItem from './CartItem';
 import classes from './Cart.module.css';
 import CartContext from '../../store/cart-context';
 import LoadingSpinner from '../UI/LoadingSpinner';
+import { promiseSleep } from '../../test-helpers/promiseSleep';
 
 const Cart = (props) => {
   const [orderLoading, setOrderLoading] = useState(false);
@@ -35,6 +36,8 @@ const Cart = (props) => {
         },
         body: JSON.stringify({ items: cartCtx.items, displayedAmount: cartCtx.totalAmount })
       });
+
+      await promiseSleep(2000);
 
       if (response.ok) {
         // Clear Cart
@@ -74,7 +77,7 @@ const Cart = (props) => {
         <span>Total Amount</span>
         <span>{totalAmount}</span>
       </div>
-      {orderLoading && <LoadingSpinner />}
+      {orderLoading && <LoadingSpinner loadingMessage='Placing your order...' />}
       <div className={classes.actions}>
         <button className={classes['button--alt']} onClick={props.onClose}>
           Close

@@ -3,16 +3,12 @@ import MealItem from './MealItem/MealItem';
 import classes from './AvailableMeals.module.css';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import { useCallback, useEffect, useState } from 'react';
+import { promiseSleep } from '../../test-helpers/promiseSleep';
 
 const AvailableMeals = () => {
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-
-  // TODO: Remove this testing - just here to test if things work in sync
-  const sleep = (ms) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
 
   // Fetch and set meals
   const fetchMeals = useCallback(async () => {
@@ -23,9 +19,8 @@ const AvailableMeals = () => {
 
       if (response.ok) {
         // TODO: Remove this line testing - Just here to test code is sync and UX is good for slower connections
-        await sleep(2000);
+        await promiseSleep(2000);
 
-        // TODO: Add error handling
         const mealData = await response.json();
 
         setMeals(mealData);
@@ -35,7 +30,7 @@ const AvailableMeals = () => {
     } catch (error) {
       setError(true);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
 
   }, []);
@@ -57,7 +52,7 @@ const AvailableMeals = () => {
 
   return (
     <section className={classes.meals}>
-      {loading && <LoadingSpinner />}
+      {loading && <LoadingSpinner loadingMessage='Loading our meals...' />}
       {!loading && mealsList.length > 0 && !error &&
         <Card>
           <ul>{mealsList}</ul>
