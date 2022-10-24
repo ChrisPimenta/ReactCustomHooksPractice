@@ -30,7 +30,7 @@ const AvailableMeals = () => {
     } catch (error) {
       setError(true);
     } finally {
-      // setLoading(false);
+      setLoading(false);
     }
 
   }, []);
