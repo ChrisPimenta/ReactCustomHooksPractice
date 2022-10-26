@@ -6,6 +6,7 @@ import classes from './Cart.module.css';
 import CartContext from '../../store/cart-context';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import useHttp from '../../hooks/use-http';
+import CheckoutForm from './CheckoutForm';
 
 const Cart = (props) => {
   const { isLoading, error, httpRequest: postOrder } = useHttp();
@@ -68,11 +69,11 @@ const Cart = (props) => {
       </div>
       {isLoading && <LoadingSpinner loadingMessage='Placing your order...' />}
       <div className={classes.actions}>
-        <button className={classes['button--alt']} onClick={props.onClose}>
+        {/* <button className={classes['button--alt']} onClick={props.onClose}>
           Close
-        </button>
-        {hasItems && <button className={classes.button} onClick={sendOrderHandler}>Order</button>}
+        </button> */}
       </div>
+      {hasItems && <CheckoutForm sendOrderHandler={sendOrderHandler} />}
       {error && <p>There was an error, please try order again.</p>}
     </Modal>
   );
